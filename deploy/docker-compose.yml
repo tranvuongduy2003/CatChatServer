@@ -1,0 +1,46 @@
+version: '3.8'
+
+# services section
+services:
+  chat.mongodb:
+    image: mongo
+    container_name: chat.mongodb
+    ports:
+      - "27018:27017"
+    volumes:
+      - mongo_data:/data/db
+    restart: always
+    environment:
+      MONGO_INITDB_DATABASE: "ChatDB"
+      MONGO_INITDB_ROOT_USERNAME: "admin"
+      MONGO_INITDB_ROOT_PASSWORD: "admin"
+  
+  chat.minio:
+    image: minio/minio:latest
+    container_name: chat.minio
+    ports:
+      - "9000:9000" # MinIO Console
+      - "9001:9001" # MinIO Admin Console
+    volumes:
+      - minio_data:/data
+      - minio_config:/root/.minio
+    restart: always
+    environment:
+      MINIO_ROOT_USER: "minioadmin"
+      MINIO_ROOT_PASSWORD: "minioadmin123"
+    command: server /data --console-address ":9001"
+
+# network section
+networks:
+  default:
+    name: chat
+    driver: bridge
+
+# volumes section
+volumes:
+  mongo_data:
+    name: mongo_data
+  minio_data:
+    name: minio_data
+  minio_config:
+    name: minio_config

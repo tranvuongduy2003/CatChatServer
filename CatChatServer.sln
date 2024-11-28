@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{B1FD3EF1-E876-4C7A-A70D-471C88291E2F}"
+	ProjectSection(SolutionItems) = preProject
+		deploy\docker-compose.yml = deploy\docker-compose.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{B680272D-8C48-4004-AA86-F0FD276FA03B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CatChatServer", "src\CatChatServer.csproj", "{B32ADDE1-F547-4AAC-9E49-D957D2EC1FA0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{28201D89-4796-4E84-8A5A-6FA3592D684C}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+		Directory.Build.props = Directory.Build.props
+		.gitignore = .gitignore
+		CatChatServer.sln = CatChatServer.sln
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B32ADDE1-F547-4AAC-9E49-D957D2EC1FA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B32ADDE1-F547-4AAC-9E49-D957D2EC1FA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B32ADDE1-F547-4AAC-9E49-D957D2EC1FA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B32ADDE1-F547-4AAC-9E49-D957D2EC1FA0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B32ADDE1-F547-4AAC-9E49-D957D2EC1FA0} = {B680272D-8C48-4004-AA86-F0FD276FA03B}
+	EndGlobalSection
+EndGlobal
