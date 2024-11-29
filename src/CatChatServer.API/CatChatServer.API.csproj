@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+    <ItemGroup Condition="'$(ImplicitUsings)' == 'enable'">
+        <Using Include="CatChatServer"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
+        <PackageReference Include="Serilog.Enrichers.Environment" Version="3.0.1"/>
+        <PackageReference Include="Serilog.Extensions.Hosting" Version="8.0.0"/>
+        <PackageReference Include="Serilog.Settings.Configuration" Version="8.0.4"/>
+        <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0"/>
+        <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0"/>
+        <PackageReference Include="Serilog.Sinks.Seq" Version="8.0.0"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="CatChatServer.Application\**" />
+      <Compile Remove="CatChatServer.Domain\**" />
+      <Compile Remove="CatChatServer.Infrastructure\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="CatChatServer.Application\**" />
+      <EmbeddedResource Remove="CatChatServer.Domain\**" />
+      <EmbeddedResource Remove="CatChatServer.Infrastructure\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="CatChatServer.Application\**" />
+      <Content Remove="CatChatServer.Domain\**" />
+      <Content Remove="CatChatServer.Infrastructure\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="CatChatServer.Application\**" />
+      <None Remove="CatChatServer.Domain\**" />
+      <None Remove="CatChatServer.Infrastructure\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="CatChatServer.Application\obj\CatChatServer.Application.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="CatChatServer.Application\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="CatChatServer.Application\obj\project.packagespec.json" />
+      <_ContentIncludedByDefault Remove="CatChatServer.Domain\obj\CatChatServer.Domain.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="CatChatServer.Domain\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="CatChatServer.Domain\obj\project.packagespec.json" />
+      <_ContentIncludedByDefault Remove="CatChatServer.Infrastructure\obj\CatChatServer.Infrastructure.csproj.nuget.dgspec.json" />
+      <_ContentIncludedByDefault Remove="CatChatServer.Infrastructure\obj\project.assets.json" />
+      <_ContentIncludedByDefault Remove="CatChatServer.Infrastructure\obj\project.packagespec.json" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\CatChatServer.Application\CatChatServer.Application.csproj" />
+      <ProjectReference Include="..\CatChatServer.Infrastructure\CatChatServer.Infrastructure.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Controllers\" />
+    </ItemGroup>
+
+</Project>
