@@ -1,7 +1,9 @@
 using System.Text;
+using CatChatServer.API.GraphQL;
 using CatChatServer.API.GraphQL.Mutations;
 using CatChatServer.API.GraphQL.Queries;
 using CatChatServer.API.GraphQL.Types;
+using CatChatServer.API.Interceptors;
 using CatChatServer.Application.Filters;
 using CatChatServer.Application.Services;
 using CatChatServer.Domain.Common.Settings;
@@ -11,11 +13,9 @@ using CatChatServer.Infrastructure.Common;
 using CatChatServer.Infrastructure.Data;
 using CatChatServer.Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.IdentityModel.Tokens;
 using Minio;
 using MongoDB.Driver;
-using MongoDB.Driver.Core.Configuration;
 using KeyNotFoundException = GreenDonut.KeyNotFoundException;
 
 namespace CatChatServer.API.Extensions;
@@ -28,8 +28,8 @@ internal static class ServiceExtensions
         services
             .ConfigureAppSettings(configuration)
             .ConfigureCors()
-            // .ConfigureAuthentication()
-            // .ConfigureAuthorization()
+            .ConfigureAuthentication()
+            .ConfigureAuthorization()
             .ConfigureMinio()
             .ConfigureMongoDB()
             .ConfigureGraphQL()
@@ -85,9 +85,17 @@ internal static class ServiceExtensions
     {
         services
             .AddGraphQLServer()
-            .AddType<UserType>()
-            .AddQueryType<UserQueries>()
-            .AddMutationType<UserMutations>()
+            .AddAuthorization()
+            .AddType<BaseType>()
+            .AddQueryType<QueryBaseType>()
+            .AddMutationType<MutationBaseType>()
+            .AddTypeExtension<UserType>()
+            .AddTypeExtension<UserQueries>()
+            .AddTypeExtension<UserMutations>()
+            .AddTypeExtension<AuthResponseType>()
+            .AddTypeExtension<AuthQueries>()
+            .AddTypeExtension<AuthMutations>()
+            .AddHttpRequestInterceptor<HttpRequestInterceptor>()
             .AddErrorFilter<GlobalErrorFilter>();
 
         return services;
@@ -168,14 +176,13 @@ internal static class ServiceExtensions
     {
         services
             .AddSingleton<IFileService, MinioStorageService>()
-            .AddSingleton<IPasswordHasher, PasswordHasherService>();
+            .AddSingleton<IPasswordHasher, PasswordHasherService>()
+            .AddSingleton<ITokenService, TokenService>();
 
         services
             .AddScoped(typeof(IRepository<>), typeof(BaseRepository<>))
-            .AddScoped<IUserRepository, UserRepository>();
-
-        services
-            .AddTransient<IAuthService, AuthService>();
+            .AddScoped<IUserRepository, UserRepository>()
+            .AddScoped<IAuthService, AuthService>();
 
         return services;
     }

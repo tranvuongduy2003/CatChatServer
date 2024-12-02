@@ -23,10 +23,6 @@ public class User : MongoEntity
 
     [BsonElement("refreshToken")] public string? RefreshToken { get; set; } // For JWT refresh token
 
-    [BsonElement("refreshTokenExpiry")]
-    [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
-    public DateTime? RefreshTokenExpiry { get; set; } // Expiry for the refresh token
-
     [BsonElement("lastLoginAt")]
     [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
     public DateTime? LastLoginAt { get; set; }

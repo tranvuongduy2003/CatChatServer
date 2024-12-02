@@ -2,11 +2,15 @@ using CatChatServer.Domain.Entities;
 using CatChatServer.Domain.Enums;
 using CatChatServer.Domain.Repositories;
 using HotChocolate;
+using HotChocolate.Authorization;
+using HotChocolate.Types;
 
 namespace CatChatServer.API.GraphQL.Mutations;
 
+[ExtendObjectType(typeof(MutationBaseType))]
 public sealed class UserMutations
 {
+    [Authorize]
     public async Task<User> CreateUser(
         [Service] IUserRepository userRepository,
         string username,
@@ -23,6 +27,7 @@ public sealed class UserMutations
         return await userRepository.AddAsync(user);
     }
 
+    [Authorize]
     public async Task<User> UpdateUserStatus(
         [Service] IUserRepository userRepository,
         string userId,

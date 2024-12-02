@@ -4,6 +4,7 @@ using HotChocolate.Types;
 
 namespace CatChatServer.API.GraphQL.Types;
 
+[ExtendObjectType(typeof(BaseType))]
 public sealed class UserType : ObjectType<User>
 {
     protected override void Configure(IObjectTypeDescriptor<User> descriptor)
@@ -17,6 +18,5 @@ public sealed class UserType : ObjectType<User>
         // Hide sensitive fields
         descriptor.Ignore(f => f.PasswordHash);
         descriptor.Ignore(f => f.RefreshToken);
-        descriptor.Ignore(f => f.RefreshTokenExpiry);
     }
 }

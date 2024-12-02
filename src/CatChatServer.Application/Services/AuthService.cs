@@ -1,11 +1,8 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using CatChatServer.Domain.Common.Settings;
 using CatChatServer.Domain.Entities;
+using CatChatServer.Domain.Enums;
 using CatChatServer.Domain.Interfaces;
+using CatChatServer.Domain.Models.Auth;
 using CatChatServer.Domain.Repositories;
-using Microsoft.IdentityModel.Tokens;
 
 namespace CatChatServer.Application.Services;
 
@@ -13,48 +10,105 @@ public class AuthService : IAuthService
 {
     private readonly IUserRepository _userRepository;
     private readonly IPasswordHasher _passwordHasher;
-    private readonly JwtSettings _jwtSettings;
+    private readonly ITokenService _tokenService;
 
-    public AuthService(IUserRepository userRepository, IPasswordHasher passwordHasher, JwtSettings jwtSettings)
+    public AuthService(IUserRepository userRepository, IPasswordHasher passwordHasher, ITokenService tokenService)
     {
         _userRepository = userRepository;
         _passwordHasher = passwordHasher;
-        _jwtSettings = jwtSettings;
+        _tokenService = tokenService;
     }
 
-    public async Task<string?> AuthenticateUserAsync(string email, string password)
+    public async Task<AuthResponse> Login(LoginRequest request)
     {
-        User user = await _userRepository.GetUserByEmailAsync(email);
-        if (user == null || !_passwordHasher.VerifyPassword(password, user.PasswordHash))
+        User user = await _userRepository.GetUserByEmailAsync(request.Email);
+        if (user == null || !_passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
         {
-            return null;
+            throw new GraphQLException("User does not exist");
+        }
+        
+        AuthResponse authResponse = GenerateTokens(user);
+        
+        user.RefreshToken = authResponse.RefreshToken;
+        
+        await _userRepository.UpdateAsync(user);
+
+        return authResponse;
+    }
+
+    public async Task<AuthResponse> Register(RegisterRequest request)
+    {
+        // Check if username already exists
+        IEnumerable<User> existingUsername = await _userRepository
+            .FindAsync(u => u.Username == request.Username);
+        if (existingUsername.Any())
+        {
+            throw new Exception("Username is already taken.");
         }
 
-        return GenerateJwtToken(user);
-    }
-
-    private string GenerateJwtToken(User user)
-    {
-        var securityKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(_jwtSettings.Key));
-        var credentials = new SigningCredentials(
-            securityKey, SecurityAlgorithms.HmacSha256);
-
-        IEnumerable<Claim> claims = new[]
+        // Check if email already exists
+        IEnumerable<User> existingEmail = await _userRepository
+            .FindAsync(u => u.Email == request.Email);
+        if (existingEmail.Any())
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Id),
-            new Claim(JwtRegisteredClaimNames.Email, user.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            throw new Exception("Email is already registered.");
+        }
+
+        // Hash password
+        string passwordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
+        // Create user
+        var user = new User
+        {
+            Username = request.Username,
+            Email = request.Email,
+            PasswordHash = passwordHash,
+            LastLoginAt = DateTime.UtcNow,
+            Status = EUserStatus.Online
         };
 
-        var token = new JwtSecurityToken(
-            issuer: _jwtSettings.Issuer,
-            audience: _jwtSettings.Audience,
-            claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(30),
-            signingCredentials: credentials
-        );
+        // Generate tokens
+        AuthResponse authResponse = GenerateTokens(user);
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+        // Set refresh token details
+        user.RefreshToken = authResponse.RefreshToken;
+
+        // Insert user
+        await _userRepository.AddAsync(user);
+
+        return authResponse;
+    }
+
+    public async Task<AuthResponse> RefreshToken(RefreshTokenRequest request)
+    {
+        IEnumerable<User> existingUsers = await _userRepository
+            .FindAsync(u => u.RefreshToken == request.RefreshToken);
+
+        User user = existingUsers.FirstOrDefault();
+
+        if (user == null || _tokenService.ValidateTokenExpired(request.RefreshToken))
+        {
+            throw new Exception("Refresh token was expired");
+        }
+
+        AuthResponse authResponse = GenerateTokens(user);
+
+        user.RefreshToken = authResponse.RefreshToken;
+
+        await _userRepository.UpdateAsync(user);
+
+        return authResponse;
+    }
+
+    private AuthResponse GenerateTokens(User user)
+    {
+        string accessToken = _tokenService.GenerateAccessToken(user);
+        string refreshToken = _tokenService.GenerateRefreshToken();
+
+        return new AuthResponse
+        {
+            AccessToken = accessToken,
+            RefreshToken = refreshToken,
+        };
     }
 }

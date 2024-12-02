@@ -1,6 +1,12 @@
+using CatChatServer.Domain.Models.Auth;
+
 namespace CatChatServer.Domain.Interfaces;
 
 public interface IAuthService
 {
-    Task<string?> AuthenticateUserAsync(string email, string password);
+    Task<AuthResponse> Login(LoginRequest request);
+
+    Task<AuthResponse> Register(RegisterRequest request);
+
+    Task<AuthResponse> RefreshToken(RefreshTokenRequest request);
 }
