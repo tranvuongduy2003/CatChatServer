@@ -1,6 +1,6 @@
 using CatChatServer.Domain.Entities;
 using CatChatServer.Domain.Enums;
-using CatChatServer.Infrastructure.Repositories;
+using CatChatServer.Domain.Repositories;
 using HotChocolate;
 
 namespace CatChatServer.API.GraphQL.Mutations;
@@ -8,7 +8,7 @@ namespace CatChatServer.API.GraphQL.Mutations;
 public sealed class UserMutations
 {
     public async Task<User> CreateUser(
-        [Service] UserRepository userRepository,
+        [Service] IUserRepository userRepository,
         string username,
         string email,
         string password)
@@ -24,7 +24,7 @@ public sealed class UserMutations
     }
 
     public async Task<User> UpdateUserStatus(
-        [Service] UserRepository userRepository,
+        [Service] IUserRepository userRepository,
         string userId,
         EUserStatus status)
     {

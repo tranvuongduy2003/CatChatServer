@@ -1,8 +1,9 @@
 using System.Linq.Expressions;
+using CatChatServer.Domain.Common.BaseEntity;
 
 namespace CatChatServer.Domain.Interfaces;
 
-public interface IRepository<TEntity> where TEntity : class
+public interface IRepository<TEntity> where TEntity : IMongoEntity
 {
     Task<TEntity> GetByIdAsync(string id);
     

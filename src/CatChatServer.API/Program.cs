@@ -10,11 +10,7 @@ builder.Services.AddServices(builder.Configuration);
 
 WebApplication app = builder.Build();
 
-app.UseAuthentication();
-
-app.UseAuthorization();
-
-app.MapGraphQLHttp();
-app.MapGraphQLWebSocket("/graphql");
+app.MapGraphQL();
+app.MapGraphQLWebSocket();
 
 app.Run();

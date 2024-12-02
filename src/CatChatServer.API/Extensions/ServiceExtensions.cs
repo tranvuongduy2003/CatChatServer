@@ -28,8 +28,8 @@ internal static class ServiceExtensions
         services
             .ConfigureAppSettings(configuration)
             .ConfigureCors()
-            .ConfigureAuthentication()
-            .ConfigureAuthorization()
+            // .ConfigureAuthentication()
+            // .ConfigureAuthorization()
             .ConfigureMinio()
             .ConfigureMongoDB()
             .ConfigureGraphQL()
@@ -85,7 +85,6 @@ internal static class ServiceExtensions
     {
         services
             .AddGraphQLServer()
-            .AddAuthorization()
             .AddType<UserType>()
             .AddQueryType<UserQueries>()
             .AddMutationType<UserMutations>()
@@ -100,17 +99,17 @@ internal static class ServiceExtensions
         MinioStorageSettings minioStorageSettings = configuration
             .GetSection(nameof(MinioStorageSettings))
             .Get<MinioStorageSettings>();
-        services.TryAddSingleton<MinioStorageSettings>(minioStorageSettings!);
+        services.AddSingleton<MinioStorageSettings>(minioStorageSettings!);
 
         MongoDBSettings mongoDBSettings = configuration
             .GetSection(nameof(MongoDBSettings))
             .Get<MongoDBSettings>();
-        services.TryAddSingleton<MongoDBSettings>(mongoDBSettings!);
+        services.AddSingleton<MongoDBSettings>(mongoDBSettings!);
 
         JwtSettings jwtSettings = configuration
             .GetSection(nameof(JwtSettings))
             .Get<JwtSettings>();
-        services.TryAddSingleton<JwtSettings>(jwtSettings!);
+        services.AddSingleton<JwtSettings>(jwtSettings!);
 
         return services;
     }
@@ -127,18 +126,19 @@ internal static class ServiceExtensions
             throw new KeyNotFoundException("MongoDBSettings is not configured");
         }
 
-        var mongoClientSettings = new MongoClientSettings
-        {
-            Scheme = ConnectionStringScheme.MongoDB,
-            Server = new MongoServerAddress(mongoDBSettings.Host, mongoDBSettings.Port),
-            Credential = MongoCredential.CreateCredential(mongoDBSettings.DatabaseName, mongoDBSettings.User,
-                mongoDBSettings.Password)
-        };
+        string mongoConnectionString =
+            $"mongodb://{mongoDBSettings.User}:{mongoDBSettings.Password}@{mongoDBSettings.Host}:{mongoDBSettings.Port}/{mongoDBSettings.DatabaseName}?authSource=admin";
 
-        using var mongoClient = new MongoClient(mongoClientSettings);
-        services.TryAddSingleton<IMongoClient>(mongoClient);
+#pragma warning disable CA2000
+        var mongoClient = new MongoClient(mongoConnectionString);
+#pragma warning restore CA2000
 
-        services.TryAddSingleton<MongoDBContext>();
+        services
+            .AddSingleton<IMongoClient>(mongoClient)
+            .AddScoped(sp =>
+                sp.GetRequiredService<IMongoClient>().StartSession());
+
+        services.AddSingleton<MongoDBContext>();
 
         return services;
     }
@@ -167,10 +167,11 @@ internal static class ServiceExtensions
     private static IServiceCollection ConfigureDependencyInjection(this IServiceCollection services)
     {
         services
-            .AddSingleton<IFileService, MinioStorageService>();
+            .AddSingleton<IFileService, MinioStorageService>()
+            .AddSingleton<IPasswordHasher, PasswordHasherService>();
 
         services
-            .AddScoped<IPasswordHasher, PasswordHasherService>()
+            .AddScoped(typeof(IRepository<>), typeof(BaseRepository<>))
             .AddScoped<IUserRepository, UserRepository>();
 
         services

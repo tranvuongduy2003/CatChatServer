@@ -5,14 +5,14 @@ using MongoDB.Driver;
 
 namespace CatChatServer.Infrastructure.Common;
 
-public abstract class BaseRepository<TEntity> : IRepository<TEntity>
-    where TEntity : MongoEntity
+public class BaseRepository<TEntity> : IRepository<TEntity>
+    where TEntity : IMongoEntity
 {
     protected readonly IMongoCollection<TEntity> _collection;
 
     protected BaseRepository(IMongoCollection<TEntity> collection)
     {
-        _collection = collection;
+        _collection = collection ?? throw new ArgumentNullException(nameof(collection));
     }
 
     public virtual async Task<TEntity> GetByIdAsync(string id) =>
