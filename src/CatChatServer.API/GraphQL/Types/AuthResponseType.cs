@@ -4,7 +4,7 @@ using HotChocolate.Types;
 namespace CatChatServer.API.GraphQL.Types;
 
 [ExtendObjectType(typeof(BaseType))]
-public sealed class AuthResponseType : ObjectType<AuthResponse>
+internal sealed class AuthResponseType : ObjectType<AuthResponse>
 {
     protected override void Configure(IObjectTypeDescriptor<AuthResponse> descriptor)
     {

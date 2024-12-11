@@ -3,7 +3,7 @@ using Serilog;
 
 namespace CatChatServer.API.Extensions;
 
-public static class HostExtensions
+internal static class HostExtensions
 {
     public static IHostBuilder ConfigureLogging(this IHostBuilder builder, IWebHostEnvironment environment,
         IConfiguration configuration)

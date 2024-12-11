@@ -5,7 +5,7 @@ using HotChocolate.Types;
 namespace CatChatServer.API.GraphQL.Types;
 
 [ExtendObjectType(typeof(BaseType))]
-public sealed class UserType : ObjectType<User>
+internal sealed class UserType : ObjectType<User>
 {
     protected override void Configure(IObjectTypeDescriptor<User> descriptor)
     {

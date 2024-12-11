@@ -5,12 +5,11 @@ using HotChocolate;
 using HotChocolate.Authorization;
 using HotChocolate.Types;
 using Microsoft.IdentityModel.JsonWebTokens;
-using MongoDB.Bson;
 
 namespace CatChatServer.API.GraphQL.Queries;
 
 [ExtendObjectType(typeof(QueryBaseType))]
-public sealed class AuthQueries
+internal sealed class AuthQueries
 {
     [Authorize]
     public async Task<User> GetMe(

@@ -10,6 +10,8 @@ builder.Services.AddServices(builder.Configuration);
 
 WebApplication app = builder.Build();
 
+app.UseCors("AllowReactApp");
+
 app.UseAuthentication();
 
 app.UseAuthorization();

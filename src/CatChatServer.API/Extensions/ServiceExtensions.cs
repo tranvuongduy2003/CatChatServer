@@ -44,10 +44,9 @@ internal static class ServiceExtensions
         {
             options.AddPolicy("AllowReactApp", builder =>
             {
-                builder.WithOrigins("*")
-                    .AllowAnyHeader()
+                builder.AllowAnyHeader()
                     .AllowAnyMethod()
-                    .AllowCredentials();
+                    .AllowAnyOrigin();
             });
         });
 

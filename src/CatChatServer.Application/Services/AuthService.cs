@@ -22,9 +22,14 @@ public class AuthService : IAuthService
     public async Task<AuthResponse> Login(LoginRequest request)
     {
         User user = await _userRepository.GetUserByEmailAsync(request.Email);
-        if (user == null || !_passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
+        if (user == null)
         {
             throw new GraphQLException("User does not exist");
+        }
+
+        if (!_passwordHasher.VerifyPassword(request.Password, user.PasswordHash))
+        {
+            throw new GraphQLException("Password does not match");
         }
         
         AuthResponse authResponse = GenerateTokens(user);

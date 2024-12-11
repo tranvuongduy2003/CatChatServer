@@ -8,7 +8,7 @@ using HotChocolate.Types;
 namespace CatChatServer.API.GraphQL.Mutations;
 
 [ExtendObjectType(typeof(MutationBaseType))]
-public sealed class UserMutations
+internal sealed class UserMutations
 {
     [Authorize]
     public async Task<User> CreateUser(

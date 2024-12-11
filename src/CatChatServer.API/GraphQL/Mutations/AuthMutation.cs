@@ -1,4 +1,3 @@
-using CatChatServer.API.GraphQL.Types;
 using CatChatServer.Domain.Interfaces;
 using CatChatServer.Domain.Models.Auth;
 using HotChocolate;
@@ -8,7 +7,7 @@ using HotChocolate.Types;
 namespace CatChatServer.API.GraphQL.Mutations;
 
 [ExtendObjectType(typeof(MutationBaseType))]
-public sealed class AuthMutations
+internal sealed class AuthMutations
 {
     public async Task<AuthResponse> Register(
         [Service] IAuthService authService,
